@@ -32,4 +32,4 @@ jobs:
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: |
         zip lambda.zip notifier.py
-        aws s3 cp lambda.zip s3://eops-sandbox-build/test-actions/lambda/slack-notifier/lambda.zip
+        aws s3 cp lambda.zip s3://eops-sandbox-builds/test-actions/lambda/slack-notifier/lambda.zip
