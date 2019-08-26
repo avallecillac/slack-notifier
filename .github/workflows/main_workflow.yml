@@ -39,7 +39,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        with:
           ARTIFACTS_S3_BUCKET: eops-sandbox-builds
           ARTIFACTS_S3_PATH: test-actions/lambda/slack-notifier/
           FUNCTION_NAME: infra-required-tags-send-notification
