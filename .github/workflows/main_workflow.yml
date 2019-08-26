@@ -24,7 +24,9 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest -v test_notifier.py
-    - name: Package & Upload Artifact
+    - name: Package Artifact
+      run: |
+        zip lambda.zip notifier.py
       uses: actions/aws@master
       env:
         ARTIFACTS_S3_BUCKET: "eops-sandbox-build"
@@ -32,6 +34,5 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-      run: |
-        zip lambda.zip notifier.py
+      args: 
         aws s3 cp lambda.zip s3://{{ ARTIFACTS_S3_BUCKET }}/test-actions/lambda/slack-notifier/lambda.zip
