@@ -1,10 +1,7 @@
 name: Python package
-
 on: [push]
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -12,24 +9,39 @@ jobs:
         python-version: [3.7]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install boto3 moto awscli
-    - name: Test with unittest
-      run: |
-        python -m unittest -v test_notifier.py
-    - name: Package & Upload Artifact
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      run: |
-        zip lambda.zip notifier.py
-        aws s3 cp lambda.zip s3://eops-sandbox-builds/test-actions/lambda/slack-notifier/lambda.zip
+      - uses: actions/checkout@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3 moto awscli
+      - name: Test with unittest
+        run: |
+          python -m unittest -v test_notifier.py
+      - name: Package & Upload Artifact
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        with:
+          ARTIFACTS_S3_BUCKET: "eops-sandbox-builds"
+          ARTIFACTS_S3_PATH: "test-actions/lambda/slack-notifier/"
+        run: |
+          zip lambda.zip notifier.py
+          aws s3 cp lambda.zip s3://${{ ARTIFACTS_S3_BUCKET }}/${{ ARTIFACTS_S3_PATH }}/lambda.zip
+      - name: Deploy lambda function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        with:
+          ARTIFACTS_S3_BUCKET: "eops-sandbox-builds"
+          ARTIFACTS_S3_PATH: "test-actions/lambda/slack-notifier/"
+          FUNCTION_NAME: "infra-required-tags-send-notification"
+        run: |
+          ./deploy.sh
