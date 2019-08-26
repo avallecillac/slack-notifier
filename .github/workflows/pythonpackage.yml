@@ -23,4 +23,4 @@ jobs:
         pip install boto3
     - name: Test with unittest
       run: |
-        python -m unittest -v test_index.py
+        python -m unittest -v test_notifier.py
