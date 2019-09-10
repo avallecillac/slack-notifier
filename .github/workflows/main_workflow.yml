@@ -42,4 +42,5 @@ jobs:
           ARTIFACTS_S3_PATH: test-actions/lambda/slack-notifier/
           FUNCTION_NAME: infra-required-tags-send-notification
         run: |
+          chmod +x deploy.sh
           ./deploy.sh
